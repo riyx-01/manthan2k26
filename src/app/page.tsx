@@ -1,88 +1,76 @@
+'use client';
+
+import { useContext } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import VideoIntro from '@/components/VideoIntro';
 import { Calendar, Users, Trophy, ArrowRight, Zap, Music, Dumbbell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IntroContext } from '@/components/ClientLayout';
 
 export default function HomePage() {
+    const { introComplete } = useContext(IntroContext);
+
     return (
-        <>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: introComplete ? 1 : 0 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className={`${introComplete ? "block" : "hidden"} bg-transparent`}
+        >
             <Navbar />
-            <main>
+            <main className="bg-transparent">
                 {/* Hero Section */}
-                <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                <section
+                    className="relative flex items-center justify-center overflow-hidden bg-transparent"
+                    style={{ minHeight: '100svh' }}
+                >
                     {/* Radial glow */}
                     <div className="absolute inset-0 bg-gradient-radial from-manthan-maroon/20 via-transparent to-transparent" />
 
-                    <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
-                        {/* Decorative line */}
-                        <div className="flex items-center justify-center mb-6">
-                            <div className="h-px w-16 bg-gradient-to-r from-transparent to-manthan-gold/50" />
-                            <span className="px-4 text-manthan-gold/80 text-sm tracking-[0.3em] uppercase font-body">
-                                Presents
-                            </span>
-                            <div className="h-px w-16 bg-gradient-to-l from-transparent to-manthan-gold/50" />
-                        </div>
-
-                        {/* Title */}
-                        <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-gold-gradient mb-4 tracking-wider">
-                            MANTHAN
-                        </h1>
-                        <p className="font-heading text-xl sm:text-2xl text-manthan-crimson font-semibold mb-2 red-glow tracking-widest">
-                            2026
-                        </p>
-                        <p className="text-gray-400 text-lg sm:text-xl mb-4 font-light">
-                            The Ultimate College Tech Fest
-                        </p>
-
-                        {/* Date */}
-                        <div className="inline-flex items-center space-x-2 px-6 py-2 rounded-full border border-manthan-gold/20 bg-manthan-gold/5 mb-8">
-                            <Calendar size={18} className="text-manthan-gold" />
-                            <span className="text-manthan-gold font-medium">March 15 - 16, 2026</span>
-                        </div>
-
-                        {/* CTA */}
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link
-                                href="/register"
-                                className="px-8 py-4 bg-gradient-to-r from-manthan-maroon to-manthan-crimson text-white font-bold rounded-lg text-lg hover:from-manthan-crimson hover:to-manthan-maroon transition-all duration-300 shadow-xl shadow-manthan-maroon/30 flex items-center gap-2 group"
-                            >
-                                Register Now
-                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                    {/* Hero content */}
+                    <div className="relative z-10 text-center px-4">
+                        <motion.h1
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: introComplete ? 0 : 20, opacity: introComplete ? 1 : 0 }}
+                            transition={{ delay: 0.5, duration: 0.8 }}
+                            className="font-heading text-5xl md:text-7xl font-bold text-gold-gradient mb-6"
+                        >
+                            MANTHAN 2026
+                        </motion.h1>
+                        <motion.p
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: introComplete ? 0 : 20, opacity: introComplete ? 1 : 0 }}
+                            transition={{ delay: 0.7, duration: 0.8 }}
+                            className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-10"
+                        >
+                            Roots to Realms.
+                        </motion.p>
+                        <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: introComplete ? 0 : 20, opacity: introComplete ? 1 : 0 }}
+                            transition={{ delay: 0.9, duration: 0.8 }}
+                        >
                             <Link
                                 href="/events"
-                                className="px-8 py-4 border border-manthan-gold/30 text-manthan-gold font-semibold rounded-lg text-lg hover:bg-manthan-gold/10 transition-all duration-300"
+                                className="inline-flex items-center gap-2 px-8 py-3 bg-manthan-gold text-black font-bold rounded-full hover:bg-manthan-gold-light transition-all duration-300 shadow-lg shadow-manthan-gold/20"
                             >
                                 Explore Events
+                                <ArrowRight size={20} />
                             </Link>
-                        </div>
+                        </motion.div>
                     </div>
 
                     {/* Scroll indicator */}
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+                    <div className="absolute bottom-8 
+                    left-1/2 -translate-x-1/2 animate-bounce">
                         <div className="w-6 h-10 rounded-full border-2 border-manthan-gold/30 flex items-start justify-center p-1">
                             <div className="w-1.5 h-3 bg-manthan-gold/50 rounded-full animate-pulse" />
                         </div>
                     </div>
                 </section>
 
-                {/* Stats Section */}
-                <section className="py-16 px-4">
-                    <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {[
-                            { value: '12+', label: 'Events', icon: Trophy },
-                            { value: '200+', label: 'Participants', icon: Users },
-                            { value: '2', label: 'Days', icon: Calendar },
-                            { value: '₹50K+', label: 'Prize Pool', icon: Zap },
-                        ].map((stat) => (
-                            <div key={stat.label} className="glass-card p-6 text-center">
-                                <stat.icon size={28} className="mx-auto mb-3 text-manthan-gold" />
-                                <div className="text-3xl font-bold text-gold-gradient font-heading">{stat.value}</div>
-                                <div className="text-gray-400 text-sm mt-1">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
 
                 {/* Event Categories Section */}
                 <section className="py-16 px-4">
@@ -162,6 +150,7 @@ export default function HomePage() {
                 </section>
             </main>
             <Footer />
-        </>
+        </motion.div>
     );
 }
+
