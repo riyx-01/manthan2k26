@@ -68,7 +68,15 @@ export async function POST(request: NextRequest) {
     try {
         // Rate limiting
         const ip = getClientIp(request);
-        const { allowed } = await checkRateLimit(ip, 'create-order');
+        let allowed = true;
+        try {
+            const limitResult = await checkRateLimit(ip, 'create-order');
+            allowed = limitResult.allowed;
+        } catch (rlError) {
+            console.error('Rate limit service error:', rlError);
+            // We continue even if rate limiting fails to avoid blocking users
+        }
+
         if (!allowed) {
             return NextResponse.json(
                 { error: 'Too many requests. Please try again later.' },
@@ -78,6 +86,7 @@ export async function POST(request: NextRequest) {
 
         // Parse and validate input
         const body = await request.json();
+        console.log('Payment API Request Body:', JSON.stringify(body, null, 2));
         const validation = registrationSchema.safeParse(body);
 
         if (!validation.success) {
@@ -103,9 +112,11 @@ export async function POST(request: NextRequest) {
         );
 
         // Fetch events from static catalog to calculate amount SERVER-SIDE
+        console.log('Validating event IDs:', event_ids);
         const events = getEventsByIds(event_ids);
 
         if (!events || events.length === 0) {
+            console.warn('No events found for IDs:', event_ids);
             return NextResponse.json(
                 { error: 'Selected events not found or are no longer active' },
                 { status: 400 }
@@ -114,6 +125,7 @@ export async function POST(request: NextRequest) {
 
         // Verify all selected events exist and are active
         if (events.length !== event_ids.length) {
+            console.warn('Mismatched event count. Requested:', event_ids.length, 'Found:', events.length);
             return NextResponse.json(
                 { error: 'Some selected events are invalid or inactive' },
                 { status: 400 }
@@ -180,6 +192,7 @@ export async function POST(request: NextRequest) {
 
         // Create Razorpay order
         const razorpay = getRazorpay();
+        console.log('Creating Razorpay order for amount (paise):', totalAmountPaise);
         const order = await razorpay.orders.create({
             amount: totalAmountPaise,
             currency: 'INR',
@@ -210,9 +223,9 @@ export async function POST(request: NextRequest) {
         });
 
         if (insertError) {
-            console.error('Failed to create registration:', insertError);
+            console.error('Failed to create registration (Supabase Error):', insertError);
             return NextResponse.json(
-                { error: 'Failed to create registration. Please try again.' },
+                { error: 'Failed to create registration in database.', details: insertError.message },
                 { status: 500 }
             );
         }
@@ -225,10 +238,15 @@ export async function POST(request: NextRequest) {
             },
             ticket_id: ticketId,
         });
-    } catch (err) {
-        console.error('Create order error:', err);
+    } catch (err: any) {
+        console.error('Create order error details:', {
+            message: err.message,
+            stack: err.stack,
+            cause: err.cause,
+            response: err.response?.data
+        });
         return NextResponse.json(
-            { error: 'Internal server error. Please try again.' },
+            { error: 'Internal server error. Please try again.', details: err.message },
             { status: 500 }
         );
     }

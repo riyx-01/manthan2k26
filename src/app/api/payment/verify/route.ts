@@ -83,22 +83,30 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const qrCodePromise = QRCode.toDataURL(registration.ticket_id, {
-            width: 220,
-            margin: 1,
-            color: {
-                dark: '#d4a837',
-                light: '#0a0a0a',
-            },
-        });
+        // Generate QR code (stored as data URL for now, but better in Supabase Storage later)
+        let qrCodeDataUrl = null;
+        try {
+            qrCodeDataUrl = await QRCode.toDataURL(registration.ticket_id, {
+                width: 300,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff',
+                },
+            });
+        } catch (qrError) {
+            console.error('QR generation failed:', qrError);
+        }
 
-        // Update registration: mark as PAID and store payment details first
+        // Update registration: mark as PAID, store payment details, and QR code
         const { error: updateError } = await supabaseAdmin
             .from('registrations')
             .update({
                 payment_status: 'PAID',
                 razorpay_payment_id,
                 razorpay_signature,
+                qr_code: qrCodeDataUrl,
+                updated_at: new Date().toISOString(),
             })
             .eq('id', registration.id);
 
@@ -108,16 +116,6 @@ export async function POST(request: NextRequest) {
                 { error: 'Failed to confirm registration. Contact support with your payment ID.' },
                 { status: 500 }
             );
-        }
-
-        try {
-            const qrCodeDataUrl = await qrCodePromise;
-            await supabaseAdmin
-                .from('registrations')
-                .update({ qr_code: qrCodeDataUrl })
-                .eq('id', registration.id);
-        } catch (qrError) {
-            console.error('QR generation/update failed:', qrError);
         }
 
         return NextResponse.json({
