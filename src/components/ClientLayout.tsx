@@ -26,21 +26,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const startTimeRef = useRef<number | null>(null);
     const isMobile = useIsMobile();
 
-    // Skip intro if already shown this session (runs after hydration)
-    useEffect(() => {
-        try {
-            if (sessionStorage.getItem('manthan_intro_seen') === 'true') {
-                setIntroComplete(true);
-            }
-        } catch { }
-    }, []);
-
-    // Persist intro completion to sessionStorage
-    const handleIntroComplete = () => {
-        setIntroComplete(true);
-        try { sessionStorage.setItem('manthan_intro_seen', 'true'); } catch { }
-    };
-
     const bgVideoSrc = isMobile ? '/theme2-mobile.mp4' : '/theme2-desktop.mp4';
 
     // Sync timing and handle manual loop fading
@@ -120,7 +105,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             {/* Global Intro - Handles both first load and refresh */}
             <AnimatePresence mode="wait">
                 {isLandingPage && !introComplete && (
-                    <VideoIntro key="intro" onComplete={handleIntroComplete} />
+                    <VideoIntro key="intro" onComplete={() => setIntroComplete(true)} />
                 )}
             </AnimatePresence>
 
