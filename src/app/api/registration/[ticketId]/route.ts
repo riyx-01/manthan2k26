@@ -3,9 +3,11 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { getEventsByIds } from '@/lib/events-catalog';
 
 export async function GET(
+    request: Request,
     { params }: { params: { ticketId: string } }
 ) {
     try {
+        void request;
         const { ticketId } = params;
         const { data: registration, error } = await supabaseAdmin
             .from('registrations')

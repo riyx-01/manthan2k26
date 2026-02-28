@@ -25,11 +25,42 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Authenticate with Supabase Auth
-        const { data: authData, error: authError } = await authClient.auth.signInWithPassword({
-            email,
-            password,
-        });
+        // Authenticate with Supabase Auth (supports both v1 and v2 clients)
+        const authApi = authClient.auth as unknown as {
+            signInWithPassword?: (credentials: { email: string; password: string }) => Promise<{
+                data?: { user?: { id: string; email?: string | null } | null; session?: { access_token?: string | null } | null };
+                error?: unknown;
+            }>;
+            signIn?: (credentials: { email: string; password: string }) => Promise<{
+                user?: { id: string; email?: string | null } | null;
+                session?: { access_token?: string | null } | null;
+                error?: unknown;
+            }>;
+        };
+
+        let authData: { user: { id: string; email?: string | null } | null; session: { access_token?: string | null } | null } = {
+            user: null,
+            session: null,
+        };
+        let authError: unknown = null;
+
+        if (authApi.signInWithPassword) {
+            const result = await authApi.signInWithPassword({ email, password });
+            authError = result.error;
+            authData = {
+                user: result.data?.user || null,
+                session: result.data?.session || null,
+            };
+        } else if (authApi.signIn) {
+            const result = await authApi.signIn({ email, password });
+            authError = result.error;
+            authData = {
+                user: result.user || null,
+                session: result.session || null,
+            };
+        } else {
+            return NextResponse.json({ error: 'Supabase auth method not available' }, { status: 500 });
+        }
 
         if (authError || !authData.user) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });

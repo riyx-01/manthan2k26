@@ -7,8 +7,26 @@ async function verifyAdmin(request: NextRequest) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
 
     const token = authHeader.split(' ')[1];
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    if (error || !user) return null;
+    const authClient = supabaseAdmin.auth as unknown as {
+        getUser?: (jwt: string) => Promise<{ data?: { user?: { id: string; email?: string | null } | null }; error?: unknown }>;
+        api?: {
+            getUser?: (jwt: string) => Promise<{ user?: { id: string; email?: string | null } | null; error?: unknown }>;
+        };
+    };
+
+    let user: { id: string; email?: string | null } | null | undefined;
+
+    if (authClient.getUser) {
+        const { data, error } = await authClient.getUser(token);
+        if (error) return null;
+        user = data?.user;
+    } else if (authClient.api?.getUser) {
+        const { user: apiUser, error } = await authClient.api.getUser(token);
+        if (error) return null;
+        user = apiUser;
+    }
+
+    if (!user) return null;
 
     const { data: adminById } = await supabaseAdmin
         .from('admin_users')
