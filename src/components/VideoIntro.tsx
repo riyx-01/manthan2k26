@@ -11,11 +11,8 @@ interface VideoIntroProps {
  * Determine video source synchronously to avoid hydration/source-switch issues.
  */
 function getVideoSrc(): string {
-    if (typeof window === 'undefined') return '/p2-desktop.mp4';
-    const isMobile =
-        window.innerWidth < 768 ||
-        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-    return isMobile ? '/p2-mobile.mp4' : '/p2-desktop.mp4';
+    // We now use a single high-quality intro video hosted on Vercel CDN for both desktop and mobile
+    return 'https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/manthan/videos/p2_hq.mp4';
 }
 
 export default function VideoIntro({ onComplete }: VideoIntroProps) {

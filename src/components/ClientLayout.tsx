@@ -26,7 +26,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const startTimeRef = useRef<number | null>(null);
     const isMobile = useIsMobile();
 
-    const bgVideoSrc = isMobile ? '/theme2-mobile.mp4' : '/theme2-desktop.mp4';
+    const bgVideoSrc = 'https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/manthan/videos/theme3_hq.mp4';
 
     // Sync timing and handle manual loop fading
     const handleTimeUpdate = () => {
