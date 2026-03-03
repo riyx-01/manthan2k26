@@ -25,12 +25,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const backgroundPlayedRef = useRef(false);
     const startTimeRef = useRef<number | null>(null);
 
-    const bgVideoSrc = 'https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/manthan/videos/theme3_hq.mp4';
+    const bgVideoSrc = 'https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/night_bg.mp4';
 
     // Sync timing and handle manual loop fading
     const handleTimeUpdate = () => {
         const video = videoRef.current;
         if (video && video.duration) {
+            // Bypass logic for short videos (e.g. < 10s) to avoid permanent fade-out
+            if (video.duration < 10) {
+                if (isLoopFading) setIsLoopFading(false);
+                return;
+            }
+
             const fadeDuration = 4.5;
             // Fade out starts 4.5s before end
             if (video.currentTime > video.duration - fadeDuration) {
@@ -77,22 +83,33 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }, []);
 
     useEffect(() => {
-        if ((introComplete || !isLandingPage) && videoRef.current && !backgroundPlayedRef.current) {
+        if ((introComplete || !isLandingPage) && videoRef.current) {
             const video = videoRef.current;
-            // Lazy-load: set source only when needed
-            if (!video.src || video.src === '') {
+
+            // Check if source needs updating (e.g. URL change or initial state)
+            if (!video.src || video.src !== bgVideoSrc) {
                 video.src = bgVideoSrc;
                 video.load();
+                backgroundPlayedRef.current = false;
             }
+
+            if (backgroundPlayedRef.current) return;
+
             const onCanPlay = () => {
                 setBgVideoReady(true);
                 video.play().then(() => {
                     if (!startTimeRef.current) startTimeRef.current = Date.now();
                 }).catch(() => { });
                 video.removeEventListener('canplay', onCanPlay);
+                backgroundPlayedRef.current = true;
             };
-            video.addEventListener('canplay', onCanPlay);
-            backgroundPlayedRef.current = true;
+
+            // If video is already ready to play, trigger manually
+            if (video.readyState >= 3) {
+                onCanPlay();
+            } else {
+                video.addEventListener('canplay', onCanPlay);
+            }
         }
     }, [introComplete, isLandingPage, bgVideoSrc]);
 

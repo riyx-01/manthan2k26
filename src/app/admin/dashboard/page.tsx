@@ -7,7 +7,7 @@ import { formatFee } from '@/lib/constants';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import {
     LogOut, Search, Users, IndianRupee, CheckCircle,
-    Clock, RefreshCw, UserCheck, AlertCircle, ChevronDown
+    Clock, RefreshCw, UserCheck, AlertCircle, ChevronDown, Download
 } from 'lucide-react';
 
 interface Stats {
@@ -17,7 +17,7 @@ interface Stats {
     pendingPayments: number;
 }
 
-type AdminTab = 'registrations' | 'cash';
+type AdminTab = 'registrations' | 'pending' | 'cash';
 
 interface CashDraft {
     cash_amount: number;
@@ -53,14 +53,20 @@ export default function AdminDashboard() {
     const [checkingIn, setCheckingIn] = useState<string | null>(null);
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
-    // Tabs + cash payment state
+    // Tabs
     const [activeTab, setActiveTab] = useState<AdminTab>('registrations');
-    const [cashRows, setCashRows] = useState<Registration[]>([]);
-    const [cashScope, setCashScope] = useState<'pending' | 'cash' | 'all'>('pending');
-    const [cashSearch, setCashSearch] = useState('');
-    const [cashLoading, setCashLoading] = useState(false);
+
+    // Pending payments state
+    const [pendingRows, setPendingRows] = useState<Registration[]>([]);
+    const [pendingSearch, setPendingSearch] = useState('');
+    const [pendingLoading, setPendingLoading] = useState(false);
     const [savingCashId, setSavingCashId] = useState<string | null>(null);
     const [cashDrafts, setCashDrafts] = useState<Record<string, CashDraft>>({});
+
+    // Cash payments state
+    const [cashRows, setCashRows] = useState<Registration[]>([]);
+    const [cashSearch, setCashSearch] = useState('');
+    const [cashLoading, setCashLoading] = useState(false);
     const [manualEntries, setManualEntries] = useState<ManualCashEntry[]>([]);
     const [manualLoading, setManualLoading] = useState(false);
     const [savingManual, setSavingManual] = useState(false);
@@ -115,13 +121,53 @@ export default function AdminDashboard() {
         }
     }, [search, statusFilter, eventFilter, dateFilter, page, router]);
 
+    const fetchPendingRows = useCallback(async () => {
+        const token = getToken();
+        if (!token) return;
+
+        setPendingLoading(true);
+        try {
+            const params = new URLSearchParams({ scope: 'pending' });
+            if (pendingSearch.trim()) {
+                params.set('search', pendingSearch.trim());
+            }
+
+            const res = await fetch(`/api/admin/cash-payment?${params}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (res.status === 401) {
+                router.push('/admin');
+                return;
+            }
+
+            const data = await res.json();
+            const rows: Registration[] = data.registrations || [];
+            setPendingRows(rows);
+
+            const nextDrafts: Record<string, CashDraft> = {};
+            rows.forEach((row) => {
+                nextDrafts[row.id] = {
+                    cash_amount: Math.round((row.cash_amount ?? row.total_amount) / 100),
+                    cash_receipt_number: row.cash_receipt_number ?? '',
+                    cash_notes: row.cash_notes ?? '',
+                };
+            });
+            setCashDrafts(nextDrafts);
+        } catch {
+            console.error('Failed to fetch pending rows');
+        } finally {
+            setPendingLoading(false);
+        }
+    }, [pendingSearch, router]);
+
     const fetchCashRows = useCallback(async () => {
         const token = getToken();
         if (!token) return;
 
         setCashLoading(true);
         try {
-            const params = new URLSearchParams({ scope: cashScope });
+            const params = new URLSearchParams({ scope: 'cash' });
             if (cashSearch.trim()) {
                 params.set('search', cashSearch.trim());
             }
@@ -136,24 +182,13 @@ export default function AdminDashboard() {
             }
 
             const data = await res.json();
-            const rows: Registration[] = data.registrations || [];
-            setCashRows(rows);
-
-            const nextDrafts: Record<string, CashDraft> = {};
-            rows.forEach((row) => {
-                nextDrafts[row.id] = {
-                    cash_amount: row.cash_amount ?? row.total_amount,
-                    cash_receipt_number: row.cash_receipt_number ?? '',
-                    cash_notes: row.cash_notes ?? '',
-                };
-            });
-            setCashDrafts(nextDrafts);
+            setCashRows(data.registrations || []);
         } catch {
             console.error('Failed to fetch cash rows');
         } finally {
             setCashLoading(false);
         }
-    }, [cashScope, cashSearch, router]);
+    }, [cashSearch, router]);
 
     const fetchManualEntries = useCallback(async () => {
         const token = getToken();
@@ -191,10 +226,13 @@ export default function AdminDashboard() {
     }, [fetchRegistrations]);
 
     useEffect(() => {
+        if (activeTab === 'pending') {
+            fetchPendingRows();
+        }
         if (activeTab === 'cash') {
             Promise.all([fetchCashRows(), fetchManualEntries()]);
         }
-    }, [activeTab, fetchCashRows, fetchManualEntries]);
+    }, [activeTab, fetchPendingRows, fetchCashRows, fetchManualEntries]);
 
     // Auto-refresh every 30 seconds
     useEffect(() => {
@@ -203,13 +241,16 @@ export default function AdminDashboard() {
             if (activeTab === 'registrations') {
                 fetchRegistrations();
             }
+            if (activeTab === 'pending') {
+                fetchPendingRows();
+            }
             if (activeTab === 'cash') {
                 fetchCashRows();
                 fetchManualEntries();
             }
         }, 30000);
         return () => clearInterval(interval);
-    }, [fetchStats, fetchRegistrations, fetchCashRows, fetchManualEntries, activeTab]);
+    }, [fetchStats, fetchRegistrations, fetchPendingRows, fetchCashRows, fetchManualEntries, activeTab]);
 
     const handleCheckIn = async (regId: string) => {
         const token = getToken();
@@ -255,6 +296,9 @@ export default function AdminDashboard() {
         if (activeTab === 'registrations') {
             fetchRegistrations();
         }
+        if (activeTab === 'pending') {
+            fetchPendingRows();
+        }
         if (activeTab === 'cash') {
             fetchCashRows();
             fetchManualEntries();
@@ -298,7 +342,7 @@ export default function AdminDashboard() {
                 },
                 body: JSON.stringify({
                     registration_id: registrationId,
-                    cash_amount: draft.cash_amount,
+                    cash_amount: Math.round(draft.cash_amount * 100),
                     cash_receipt_number: draft.cash_receipt_number || null,
                     cash_notes: draft.cash_notes || null,
                 }),
@@ -310,7 +354,7 @@ export default function AdminDashboard() {
                 return;
             }
 
-            await Promise.all([fetchStats(), fetchRegistrations(), fetchCashRows()]);
+            await Promise.all([fetchStats(), fetchRegistrations(), fetchPendingRows()]);
         } catch {
             alert('Failed to save cash payment');
         } finally {
@@ -348,7 +392,7 @@ export default function AdminDashboard() {
                     payer_name: manualForm.payer_name,
                     payer_phone: manualForm.payer_phone || null,
                     payer_email: manualForm.payer_email || null,
-                    amount,
+                    amount: Math.round(amount * 100),
                     receipt_number: manualForm.receipt_number || null,
                     notes: manualForm.notes || null,
                 }),
@@ -481,6 +525,15 @@ export default function AdminDashboard() {
                         Registrations
                     </button>
                     <button
+                        onClick={() => setActiveTab('pending')}
+                        className={`px-4 py-2 rounded-lg text-sm transition-colors ${activeTab === 'pending'
+                            ? 'bg-manthan-gold/20 text-manthan-gold border border-manthan-gold/30'
+                            : 'text-gray-400 hover:text-manthan-gold'
+                            }`}
+                    >
+                        Pending Payments
+                    </button>
+                    <button
                         onClick={() => setActiveTab('cash')}
                         className={`px-4 py-2 rounded-lg text-sm transition-colors ${activeTab === 'cash'
                             ? 'bg-manthan-gold/20 text-manthan-gold border border-manthan-gold/30'
@@ -543,11 +596,39 @@ export default function AdminDashboard() {
                             </div>
                         </div>
 
-                        {/* Results count */}
+                        {/* Results count + Export */}
                         <div className="flex items-center justify-between mb-4">
                             <p className="text-gray-500 text-sm">
                                 Showing {registrations.length} of {total} registrations
                             </p>
+                            <button
+                                onClick={async () => {
+                                    const token = getToken();
+                                    if (!token) return;
+                                    try {
+                                        const res = await fetch('/api/admin/export', {
+                                            headers: { Authorization: `Bearer ${token}` },
+                                        });
+                                        if (!res.ok) {
+                                            alert('Export failed');
+                                            return;
+                                        }
+                                        const blob = await res.blob();
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `manthan_registrations_${new Date().toISOString().slice(0, 10)}.csv`;
+                                        a.click();
+                                        URL.revokeObjectURL(url);
+                                    } catch {
+                                        alert('Export failed. Please try again.');
+                                    }
+                                }}
+                                className="flex items-center gap-2 px-4 py-2 text-sm bg-manthan-gold/10 text-manthan-gold rounded-lg hover:bg-manthan-gold/20 transition-colors border border-manthan-gold/20"
+                            >
+                                <Download size={16} />
+                                Export CSV
+                            </button>
                         </div>
 
                         {/* Registrations Table */}
@@ -721,96 +802,31 @@ export default function AdminDashboard() {
                     </>
                 )}
 
-                {activeTab === 'cash' && (
+                {activeTab === 'pending' && (
                     <>
-                        <div className="glass-card p-4 mb-6">
-                            <h3 className="text-sm font-semibold text-manthan-gold mb-4">Add Manual Cash Entry</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                <input
-                                    type="text"
-                                    value={manualForm.payer_name}
-                                    onChange={(e) => handleManualFormChange('payer_name', e.target.value)}
-                                    placeholder="Payer Name *"
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                />
-                                <input
-                                    type="text"
-                                    value={manualForm.payer_phone}
-                                    onChange={(e) => handleManualFormChange('payer_phone', e.target.value)}
-                                    placeholder="Phone"
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                />
-                                <input
-                                    type="email"
-                                    value={manualForm.payer_email}
-                                    onChange={(e) => handleManualFormChange('payer_email', e.target.value)}
-                                    placeholder="Email"
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                />
-                                <input
-                                    type="number"
-                                    min={1}
-                                    value={manualForm.amount}
-                                    onChange={(e) => handleManualFormChange('amount', e.target.value)}
-                                    placeholder="Amount (paise) *"
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                />
-                                <input
-                                    type="text"
-                                    value={manualForm.receipt_number}
-                                    onChange={(e) => handleManualFormChange('receipt_number', e.target.value)}
-                                    placeholder="Receipt Number"
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                />
-                                <input
-                                    type="text"
-                                    value={manualForm.notes}
-                                    onChange={(e) => handleManualFormChange('notes', e.target.value)}
-                                    placeholder="Notes"
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                />
-                            </div>
-                            <div className="mt-4">
-                                <button
-                                    onClick={handleAddManualEntry}
-                                    disabled={savingManual}
-                                    className="px-4 py-2.5 text-sm bg-manthan-gold/10 text-manthan-gold rounded-lg hover:bg-manthan-gold/20 transition-colors disabled:opacity-50"
-                                >
-                                    {savingManual ? 'Adding...' : 'Add Manual Entry'}
-                                </button>
-                            </div>
-                        </div>
-
+                        {/* Search */}
                         <div className="glass-card p-4 mb-6">
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="flex-1 min-w-[240px] relative">
                                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                                     <input
                                         type="text"
-                                        value={cashSearch}
-                                        onChange={(e) => setCashSearch(e.target.value)}
+                                        value={pendingSearch}
+                                        onChange={(e) => setPendingSearch(e.target.value)}
                                         placeholder="Search by ticket ID, name, email, phone..."
                                         className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:border-manthan-gold/50 focus:outline-none transition-colors"
                                     />
                                 </div>
-                                <select
-                                    value={cashScope}
-                                    onChange={(e) => setCashScope(e.target.value as 'pending' | 'cash' | 'all')}
-                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
-                                >
-                                    <option value="pending">Pending (collect cash)</option>
-                                    <option value="cash">Cash Paid</option>
-                                    <option value="all">All Registrations</option>
-                                </select>
                                 <button
-                                    onClick={fetchCashRows}
+                                    onClick={fetchPendingRows}
                                     className="px-4 py-2.5 text-sm bg-manthan-gold/10 text-manthan-gold rounded-lg hover:bg-manthan-gold/20 transition-colors"
                                 >
-                                    Apply
+                                    Search
                                 </button>
                             </div>
                         </div>
 
+                        {/* Pending registrations table */}
                         <div className="glass-card overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm min-w-[980px]">
@@ -820,16 +836,16 @@ export default function AdminDashboard() {
                                             <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Name</th>
                                             <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Phone</th>
                                             <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Status</th>
-                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Cash Amount</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Cash Amount (₹)</th>
                                             <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Receipt #</th>
                                             <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Notes</th>
                                             <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {cashRows.map((row) => {
+                                        {pendingRows.map((row) => {
                                             const draft = cashDrafts[row.id] || {
-                                                cash_amount: row.cash_amount ?? row.total_amount,
+                                                cash_amount: Math.round((row.cash_amount ?? row.total_amount) / 100),
                                                 cash_receipt_number: row.cash_receipt_number ?? '',
                                                 cash_notes: row.cash_notes ?? '',
                                             };
@@ -841,12 +857,8 @@ export default function AdminDashboard() {
                                                     <td className="px-4 py-3 text-gray-200">{row.name}</td>
                                                     <td className="px-4 py-3 text-gray-400">{row.phone}</td>
                                                     <td className="px-4 py-3">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.payment_status === 'PAID'
-                                                            ? 'bg-green-500/20 text-green-400'
-                                                            : 'bg-yellow-500/20 text-yellow-400'
-                                                            }`}>
-                                                            {row.payment_status}
-                                                            {row.payment_method ? ` • ${row.payment_method}` : ''}
+                                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400">
+                                                            PENDING
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3">
@@ -890,10 +902,145 @@ export default function AdminDashboard() {
                                 </table>
                             </div>
 
+                            {!pendingLoading && pendingRows.length === 0 && (
+                                <div className="py-16 text-center">
+                                    <AlertCircle size={32} className="mx-auto text-gray-600 mb-3" />
+                                    <p className="text-gray-500">No pending payments found.</p>
+                                </div>
+                            )}
+
+                            {pendingLoading && (
+                                <div className="py-16 text-center">
+                                    <LoadingSpinner />
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+
+                {activeTab === 'cash' && (
+                    <>
+                        {/* Add Manual Cash Entry */}
+                        <div className="glass-card p-4 mb-6">
+                            <h3 className="text-sm font-semibold text-manthan-gold mb-4">Add Manual Cash Entry</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                <input
+                                    type="text"
+                                    value={manualForm.payer_name}
+                                    onChange={(e) => handleManualFormChange('payer_name', e.target.value)}
+                                    placeholder="Payer Name *"
+                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
+                                />
+                                <input
+                                    type="text"
+                                    value={manualForm.payer_phone}
+                                    onChange={(e) => handleManualFormChange('payer_phone', e.target.value)}
+                                    placeholder="Phone"
+                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
+                                />
+                                <input
+                                    type="email"
+                                    value={manualForm.payer_email}
+                                    onChange={(e) => handleManualFormChange('payer_email', e.target.value)}
+                                    placeholder="Email"
+                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
+                                />
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={manualForm.amount}
+                                    onChange={(e) => handleManualFormChange('amount', e.target.value)}
+                                    placeholder="Amount (₹) *"
+                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
+                                />
+                                <input
+                                    type="text"
+                                    value={manualForm.receipt_number}
+                                    onChange={(e) => handleManualFormChange('receipt_number', e.target.value)}
+                                    placeholder="Receipt Number"
+                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
+                                />
+                                <input
+                                    type="text"
+                                    value={manualForm.notes}
+                                    onChange={(e) => handleManualFormChange('notes', e.target.value)}
+                                    placeholder="Notes"
+                                    className="px-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:outline-none"
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <button
+                                    onClick={handleAddManualEntry}
+                                    disabled={savingManual}
+                                    className="px-4 py-2.5 text-sm bg-manthan-gold/10 text-manthan-gold rounded-lg hover:bg-manthan-gold/20 transition-colors disabled:opacity-50"
+                                >
+                                    {savingManual ? 'Adding...' : 'Add Manual Entry'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Search */}
+                        <div className="glass-card p-4 mb-6">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex-1 min-w-[240px] relative">
+                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                    <input
+                                        type="text"
+                                        value={cashSearch}
+                                        onChange={(e) => setCashSearch(e.target.value)}
+                                        placeholder="Search by ticket ID, name, email, phone..."
+                                        className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-manthan-black/50 border border-manthan-gold/20 text-gray-200 text-sm focus:border-manthan-gold/50 focus:outline-none transition-colors"
+                                    />
+                                </div>
+                                <button
+                                    onClick={fetchCashRows}
+                                    className="px-4 py-2.5 text-sm bg-manthan-gold/10 text-manthan-gold rounded-lg hover:bg-manthan-gold/20 transition-colors"
+                                >
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Cash paid registrations table */}
+                        <div className="glass-card overflow-hidden mb-6">
+                            <div className="px-4 py-3 border-b border-manthan-gold/10">
+                                <h3 className="text-sm font-semibold text-manthan-gold">Cash Paid Registrations</h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm min-w-[780px]">
+                                    <thead>
+                                        <tr className="border-b border-manthan-gold/10 text-left">
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Ticket ID</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Name</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Phone</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Amount (₹)</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Receipt #</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Received By</th>
+                                            <th className="px-4 py-3 text-manthan-gold/70 font-medium text-xs">Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {cashRows.map((row) => (
+                                            <tr key={row.id} className="border-b border-manthan-gold/5 hover:bg-manthan-gold/5 transition-colors">
+                                                <td className="px-4 py-3">
+                                                    <span className="font-mono text-manthan-gold text-xs">{row.ticket_id}</span>
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-200">{row.name}</td>
+                                                <td className="px-4 py-3 text-gray-400">{row.phone}</td>
+                                                <td className="px-4 py-3 text-gray-200">{formatFee(row.cash_amount ?? row.total_amount)}</td>
+                                                <td className="px-4 py-3 text-gray-300">{row.cash_receipt_number || '—'}</td>
+                                                <td className="px-4 py-3 text-gray-300">{row.cash_received_by || '—'}</td>
+                                                <td className="px-4 py-3 text-gray-400">{row.cash_received_at ? new Date(row.cash_received_at).toLocaleString('en-IN') : '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
                             {!cashLoading && cashRows.length === 0 && (
                                 <div className="py-16 text-center">
                                     <AlertCircle size={32} className="mx-auto text-gray-600 mb-3" />
-                                    <p className="text-gray-500">No records found for this cash payment view.</p>
+                                    <p className="text-gray-500">No cash payments recorded yet.</p>
                                 </div>
                             )}
 
@@ -904,6 +1051,7 @@ export default function AdminDashboard() {
                             )}
                         </div>
 
+                        {/* Manual Cash Entries */}
                         <div className="glass-card overflow-hidden mb-6">
                             <div className="px-4 py-3 border-b border-manthan-gold/10">
                                 <h3 className="text-sm font-semibold text-manthan-gold">Manual Cash Entries</h3>

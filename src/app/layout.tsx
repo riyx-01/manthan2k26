@@ -17,7 +17,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head>
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/manthan_final_logo.png" />
             </head>
             <body className="min-h-screen text-gray-200 antialiased overflow-x-hidden">
                 <ClientLayout>

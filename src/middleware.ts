@@ -30,6 +30,6 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         // Apply to all routes except static files and _next
-        '/((?!_next/static|_next/image|favicon.ico).*)',
+        '/((?!_next/static|_next/image|favicon.ico|manthan_final_logo.png).*)',
     ],
 };

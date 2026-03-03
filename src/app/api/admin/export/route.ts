@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { EVENT_CATALOG } from '@/lib/events-catalog';
+
+// Build a quick lookup map: event_id -> { name, category }
+const eventMap = new Map(
+    EVENT_CATALOG.map((e) => [e.id, { name: e.name, category: e.category }])
+);
 
 // Security check
 async function verifyAdmin(request: NextRequest) {
@@ -56,11 +62,49 @@ function escapeCsv(field: string | number | boolean | null | undefined): string 
     return stringField;
 }
 
+interface TeamRegistrationData {
+    event_id: string;
+    team_name?: string | null;
+    team_size?: number;
+    members?: Array<{ name: string }>;
+}
+
+interface RegistrationRow {
+    ticket_id: string;
+    name: string;
+    email: string;
+    phone: string;
+    college: string;
+    department: string | null;
+    year: string | null;
+    event_ids: string[];
+    team_registrations: TeamRegistrationData[] | null;
+    total_amount: number;
+    payment_status: string;
+    created_at: string;
+}
+
+interface ExportRow {
+    event_category: string;
+    event_name: string;
+    ticket_id: string;
+    lead_participant_name: string;
+    lead_email: string;
+    lead_phone: string;
+    college: string;
+    department: string;
+    year: string;
+    payment_status: string;
+    total_amount: number;
+    registration_date: string;
+    team_name: string;
+    team_size: string;
+    other_team_members: string;
+}
+
 export async function GET(request: NextRequest) {
     const admin = await verifyAdmin(request);
 
-    // In strict environments, block unauthorized. To allow testing via direct URL if needed, you might bypass this temporarily, 
-    // but returning a secure API response is best.
     if (!admin) {
         return NextResponse.json({ error: 'Unauthorized. Please login with Admin panel headers first.' }, { status: 401 });
     }
@@ -68,38 +112,77 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const eventName = searchParams.get('event_name');
 
-    // Query our new Optimized View
-    let query = supabaseAdmin
-        .from('organized_event_registrations_export')
-        .select('*')
-        .order('registration_date', { ascending: false });
-
-    // Optional event filter
-    if (eventName && eventName !== 'all') {
-        query = query.ilike('event_name', `%${eventName}%`);
-    }
-
-    const { data, error } = await query;
+    // Query registrations directly from the table
+    const { data: registrations, error } = await supabaseAdmin
+        .from('registrations')
+        .select('ticket_id,name,email,phone,college,department,year,event_ids,team_registrations,total_amount,payment_status,created_at')
+        .order('created_at', { ascending: false });
 
     if (error) {
         return NextResponse.json({ error: 'Failed to generate export data' }, { status: 500 });
     }
 
-    // Convert JSON array of objects to CSV
-    if (!data || data.length === 0) {
+    if (!registrations || registrations.length === 0) {
         return new NextResponse("No data available to export.", { status: 200, headers: { 'Content-Type': 'text/plain' } });
     }
 
-    // Dynamic CSV generation
-    const headers = Object.keys(data[0]);
-    const csvRows = [];
+    // "Unravel" each registration into one row per event (matching SQL view logic)
+    const rows: ExportRow[] = [];
 
-    // Add Headers
+    for (const reg of registrations as RegistrationRow[]) {
+        const teamRegs = Array.isArray(reg.team_registrations) ? reg.team_registrations : [];
+
+        for (const eventId of reg.event_ids) {
+            const eventInfo = eventMap.get(eventId);
+            const eventNameStr = eventInfo?.name || eventId;
+            const eventCategory = eventInfo?.category || 'unknown';
+
+            // Optional event_name filter
+            if (eventName && eventName !== 'all' && !eventNameStr.toLowerCase().includes(eventName.toLowerCase())) {
+                continue;
+            }
+
+            // Find matching team registration for this event
+            const teamReg = teamRegs.find((t) => t.event_id === eventId);
+
+            const memberNames = teamReg?.members
+                ?.map((m) => m.name)
+                .join(', ') || '';
+
+            rows.push({
+                event_category: eventCategory,
+                event_name: eventNameStr,
+                ticket_id: reg.ticket_id,
+                lead_participant_name: reg.name,
+                lead_email: reg.email,
+                lead_phone: reg.phone,
+                college: reg.college,
+                department: reg.department || '',
+                year: reg.year || '',
+                payment_status: reg.payment_status,
+                total_amount: reg.total_amount,
+                registration_date: reg.created_at,
+                team_name: teamReg?.team_name || '',
+                team_size: teamReg?.team_size?.toString() || '',
+                other_team_members: memberNames,
+            });
+        }
+    }
+
+    if (rows.length === 0) {
+        return new NextResponse("No data available to export.", { status: 200, headers: { 'Content-Type': 'text/plain' } });
+    }
+
+    // Generate CSV
+    const headers = Object.keys(rows[0]) as (keyof ExportRow)[];
+    const csvRows: string[] = [];
+
+    // Header row
     csvRows.push(headers.map(escapeCsv).join(','));
 
-    // Add Body
-    data.forEach((row) => {
-        const rowValues = headers.map(header => escapeCsv(row[header]));
+    // Data rows
+    rows.forEach((row) => {
+        const rowValues = headers.map((header) => escapeCsv(row[header]));
         csvRows.push(rowValues.join(','));
     });
 

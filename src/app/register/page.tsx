@@ -1141,24 +1141,47 @@ function EventSelectionStep({
                                         </div>
                                         <div>
                                             <label className="block text-xs text-gray-500 mb-1">Team Size</label>
-                                            <input
-                                                type="number"
-                                                value={team.team_size}
-                                                min={bounds.min}
-                                                max={bounds.max}
-                                                disabled={isFixed}
-                                                onChange={(e) =>
-                                                    updateTeamRegistration(event.id, (current) => ({
-                                                        ...current,
-                                                        team_size: Number(e.target.value || bounds.min),
-                                                    }))
-                                                }
-                                                className="w-full rounded-lg border border-white/20 bg-white/[0.04] px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:border-manthan-gold/40 focus:outline-none disabled:opacity-60"
-                                            />
+                                            {isFixed ? (
+                                                <div className="w-full rounded-lg border border-white/20 bg-white/[0.04] px-3 py-2 text-sm text-gray-100 opacity-60">
+                                                    {team.team_size}
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-0 rounded-lg border border-white/20 bg-white/[0.04] overflow-hidden">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateTeamRegistration(event.id, (current) => ({
+                                                                ...current,
+                                                                team_size: current.team_size - 1,
+                                                            }))
+                                                        }
+                                                        disabled={team.team_size <= bounds.min}
+                                                        className="px-4 py-2 text-lg font-bold text-manthan-gold hover:bg-white/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed select-none"
+                                                    >
+                                                        −
+                                                    </button>
+                                                    <span className="flex-1 text-center text-sm font-semibold text-gray-100 py-2 select-none">
+                                                        {team.team_size}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateTeamRegistration(event.id, (current) => ({
+                                                                ...current,
+                                                                team_size: current.team_size + 1,
+                                                            }))
+                                                        }
+                                                        disabled={team.team_size >= bounds.max}
+                                                        className="px-4 py-2 text-lg font-bold text-manthan-gold hover:bg-white/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed select-none"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                            )}
                                             <p className="text-[11px] text-gray-600 mt-1">
                                                 {isFixed
                                                     ? `Fixed team size: ${bounds.min}`
-                                                    : `Allowed size: ${bounds.min} to ${bounds.max}`}
+                                                    : `${bounds.min} to ${bounds.max} participants`}
                                             </p>
                                         </div>
                                     </div>

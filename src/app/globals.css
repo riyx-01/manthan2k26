@@ -4,6 +4,18 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500;600;700&display=swap');
 
+@font-face {
+    font-family: 'Trajanus Roman';
+    src: url('/fonts/TrajanusRoman-6aEq.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.font-cartius {
+    font-family: 'Trajanus Roman', 'Cormorant Unicase', serif;
+}
+
 :root {
     --manthan-black: #0a0a0a;
     --manthan-dark: #1a0a0a;

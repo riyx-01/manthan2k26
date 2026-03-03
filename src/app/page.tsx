@@ -17,7 +17,7 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: introComplete ? 1 : 0 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className={`${introComplete ? "block" : "hidden"} bg-transparent`}
+            className={`${introComplete ? "block" : "hidden"} bg-transparent font-cartius`}
         >
             <Navbar />
             <main className="bg-transparent">
@@ -50,7 +50,7 @@ export default function HomePage() {
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: introComplete ? 0 : 20, opacity: introComplete ? 1 : 0 }}
                             transition={{ delay: 0.7, duration: 0.8 }}
-                            className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-10"
+                            className="text-2xl md:text-3xl text-gray-300 max-w-2xl mx-auto mb-10"
                         >
                             Roots to Realms.
                         </motion.p>
@@ -82,10 +82,10 @@ export default function HomePage() {
                 {/* Event Categories Section */}
                 <section className="py-16 px-4">
                     <div className="max-w-6xl mx-auto">
-                        <h2 className="font-heading text-3xl sm:text-4xl font-bold text-center text-gold-gradient mb-4">
+                        <h2 className="font-heading text-4xl sm:text-5xl font-bold text-center text-gold-gradient mb-4">
                             Event Categories
                         </h2>
-                        <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+                        <p className="text-gray-400 text-lg text-center mb-12 max-w-2xl mx-auto">
                             Choose from our diverse range of events across technical, cultural, and sports categories.
                         </p>
 
@@ -121,11 +121,11 @@ export default function HomePage() {
                                     className={`glass-card p-8 bg-gradient-to-br ${cat.gradient} ${cat.borderColor} transition-all duration-300`}
                                 >
                                     <cat.icon size={36} className="text-manthan-gold mb-4" />
-                                    <h3 className="font-heading text-2xl font-bold text-manthan-gold mb-3">{cat.title}</h3>
-                                    <p className="text-gray-400 text-sm mb-4">{cat.description}</p>
+                                    <h3 className="font-heading text-3xl font-bold text-manthan-gold mb-3">{cat.title}</h3>
+                                    <p className="text-gray-400 text-base mb-4">{cat.description}</p>
                                     <ul className="space-y-1.5">
                                         {cat.events.map((evt) => (
-                                            <li key={evt} className="text-gray-300 text-sm flex items-center">
+                                            <li key={evt} className="text-gray-300 text-base flex items-center">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-manthan-gold/50 mr-2" />
                                                 {evt}
                                             </li>
@@ -140,10 +140,10 @@ export default function HomePage() {
                 {/* CTA Section */}
                 <section className="py-20 px-4">
                     <div className="max-w-4xl mx-auto text-center glass-card p-12 bg-gradient-to-br from-manthan-maroon/20 to-manthan-dark">
-                        <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gold-gradient mb-4">
+                        <h2 className="font-heading text-4xl sm:text-5xl font-bold text-gold-gradient mb-4">
                             Ready to Compete?
                         </h2>
-                        <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+                        <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
                             Register now and secure your spot in Manthan 2026. Limited seats available!
                         </p>
                         <Link
