@@ -9,7 +9,7 @@ import ScrollWrapper from '@/components/ScrollWrapper';
 const teamMembers = [
     {
         name: 'Riya Thakur',
-        role: 'UI/UX Designer',
+        role: 'UI/UX Designer & Frontend Developer',
         image: '/profile/riya-thakur.png',
         isLead: true,
         imageClass: 'object-top'
