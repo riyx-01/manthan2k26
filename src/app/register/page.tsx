@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -26,13 +26,7 @@ declare global {
     }
 }
 
-function getErrorMessage(error: unknown, fallback: string): string {
-    if (error instanceof Error && error.message) {
-        return error.message;
-    }
 
-    return fallback;
-}
 
 const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'PG 1st Year', 'PG 2nd Year'];
 const steps = [
@@ -94,7 +88,6 @@ export default function RegisterPage() {
 }
 
 function RegisterForm() {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const preselectedEvent = searchParams.get('event');
 
@@ -115,8 +108,10 @@ function RegisterForm() {
     });
     const [teamRegistrations, setTeamRegistrations] = useState<Record<string, TeamRegistration>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [processing, setProcessing] = useState(false);
     const [razorpayReady, setRazorpayReady] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [paymentMessage, setPaymentMessage] = useState('');
     const [paymentError, setPaymentError] = useState('');
     const [focusedField, setFocusedField] = useState<string | null>(null);
