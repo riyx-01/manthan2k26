@@ -133,7 +133,7 @@ export default function Chatbot() {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-[100]">
+        <div className="fixed bottom-6 right-6 z-[90]">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div

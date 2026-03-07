@@ -412,7 +412,7 @@ function RegisterForm() {
                 <div className="w-full max-w-2xl overflow-visible">
                     <div className="parchment-container rounded-none parchment-theme">
                         <div className="scroll-roll" />
-                        <div className="parchment-body p-6 sm:p-10 shrink-0">
+                        <div className="parchment-body p-4 sm:p-10 shrink-0">
                             <AnimatePresence mode="wait" custom={direction}>
                                 {step === 1 && (
                                     <motion.div
@@ -575,11 +575,11 @@ function BasicInfoStep({
 
     return (
         <div>
-            <div className="mb-10 text-center sm:text-left border-b border-manthan-maroon/10 pb-6">
+            <div className="mb-6 sm:mb-10 text-center sm:text-left border-b border-manthan-maroon/10 pb-4 sm:pb-6">
                 <motion.h2
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="font-ancient text-3xl sm:text-4xl font-bold text-[#3d2b1f] mb-3"
+                    className="font-ancient text-2xl sm:text-3xl md:text-4xl font-bold text-[#3d2b1f] mb-2 sm:mb-3"
                 >
                     Personal Scroll
                 </motion.h2>
@@ -609,7 +609,7 @@ function BasicInfoStep({
                         onBlur={() => setFocusedField(null)}
                         onKeyDown={handleKeyDown}
                         placeholder="Enter your full name"
-                        className="w-full bg-transparent px-4 py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
+                        className="w-full bg-transparent px-3 py-3 sm:px-4 sm:py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
                         autoFocus
                     />
                 </FormField>
@@ -629,7 +629,7 @@ function BasicInfoStep({
                         onBlur={() => setFocusedField(null)}
                         onKeyDown={handleKeyDown}
                         placeholder="your@email.com"
-                        className="w-full bg-transparent px-4 py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
+                        className="w-full bg-transparent px-3 py-3 sm:px-4 sm:py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
                     />
                 </FormField>
 
@@ -649,7 +649,7 @@ function BasicInfoStep({
                         onKeyDown={handleKeyDown}
                         placeholder="10-digit mobile number"
                         maxLength={10}
-                        className="w-full bg-transparent px-4 py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
+                        className="w-full bg-transparent px-3 py-3 sm:px-4 sm:py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
                     />
                 </FormField>
 
@@ -668,7 +668,7 @@ function BasicInfoStep({
                         onBlur={() => setFocusedField(null)}
                         onKeyDown={handleKeyDown}
                         placeholder="Enter your college name"
-                        className="w-full bg-transparent px-4 py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
+                        className="w-full bg-transparent px-3 py-3 sm:px-4 sm:py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
                     />
                 </FormField>
 
@@ -685,7 +685,7 @@ function BasicInfoStep({
                             onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                             onFocus={() => setFocusedField('year')}
                             onBlur={() => setFocusedField(null)}
-                            className="w-full bg-transparent px-4 py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none appearance-none font-ancient"
+                            className="w-full bg-transparent px-3 py-3 sm:px-4 sm:py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none appearance-none font-ancient"
                         >
                             <option value="" className="bg-[#f4e4bc]">Select Year</option>
                             {yearOptions.map((y) => (
@@ -709,7 +709,7 @@ function BasicInfoStep({
                             onBlur={() => setFocusedField(null)}
                             onKeyDown={handleKeyDown}
                             placeholder="e.g., Computer Science"
-                            className="w-full bg-transparent px-4 py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
+                            className="w-full bg-transparent px-3 py-3 sm:px-4 sm:py-4 text-sm text-[#2c1e0f] placeholder:text-[#3d2b1f]/40 focus:outline-none font-ancient"
                         />
                     </FormField>
                 </div>
@@ -854,8 +854,8 @@ function EventSelectionStep({
 
     return (
         <div>
-            <div className="mb-10 text-center sm:text-left border-b border-manthan-maroon/10 pb-6">
-                <h2 className="font-ancient text-3xl sm:text-4xl font-bold text-[#3d2b1f] mb-3">
+            <div className="mb-6 sm:mb-10 text-center sm:text-left border-b border-manthan-maroon/10 pb-4 sm:pb-6">
+                <h2 className="font-ancient text-2xl sm:text-3xl md:text-4xl font-bold text-[#3d2b1f] mb-2 sm:mb-3">
                     Ancient Challenges
                 </h2>
                 <p className="text-[#5c4033] text-sm italic">
@@ -1033,8 +1033,8 @@ function PaymentStep({
 }) {
     return (
         <div className="space-y-8">
-            <div className="text-center sm:text-left border-b border-manthan-maroon/10 pb-6">
-                <h2 className="font-ancient text-3xl sm:text-4xl font-bold text-[#3d2b1f] mb-3">
+            <div className="mb-6 sm:mb-10 text-center sm:text-left border-b border-manthan-maroon/10 pb-4 sm:pb-6">
+                <h2 className="font-ancient text-2xl sm:text-3xl md:text-4xl font-bold text-[#3d2b1f] mb-2 sm:mb-3">
                     Final Inscription
                 </h2>
                 <p className="text-[#5c4033] text-sm italic">

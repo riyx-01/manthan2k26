@@ -56,8 +56,8 @@ export default function Navbar() {
                 opacity: visible ? 1 : 0
             }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
-            className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled
-                ? 'bg-black/95 backdrop-blur-md py-4 shadow-2xl'
+            className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-500 ${scrolled
+                ? 'bg-black/95 backdrop-blur-sm md:backdrop-blur-md py-4 shadow-2xl'
                 : 'bg-transparent py-5'
                 }`}
         >
@@ -145,7 +145,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, scale: 1.1 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="fixed inset-0 z-[105] bg-manthan-black flex flex-col items-center justify-center p-8 lg:hidden"
+                        className="fixed inset-0 z-[105] bg-manthan-black flex flex-col items-center justify-start pt-32 pb-12 px-8 lg:hidden overflow-y-auto"
                     >
                         <div className="absolute inset-0 overflow-hidden pointer-events-none">
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(139,0,0,0.2)_0%,transparent_70%)]"></div>
@@ -172,7 +172,7 @@ export default function Navbar() {
                                         className="flex items-center justify-between group w-full py-6 border-b border-manthan-gold/10"
                                     >
                                         <div className="flex flex-col">
-                                            <span className={`font-pfeffer text-4xl md:text-5xl tracking-[0.15em] transition-all duration-500 ${activeLink === link.href ? 'text-manthan-gold' : 'text-gray-500 group-hover:text-manthan-gold'
+                                            <span className={`font-pfeffer text-3xl sm:text-4xl md:text-5xl tracking-[0.15em] transition-all duration-500 ${activeLink === link.href ? 'text-manthan-gold' : 'text-gray-500 group-hover:text-manthan-gold'
                                                 }`}>
                                                 {link.label}
                                             </span>
@@ -198,7 +198,7 @@ export default function Navbar() {
                                 >
                                     <AnimatedButton
                                         icon={Sparkles}
-                                        className="w-full py-6 text-2xl"
+                                        className="w-full py-4 sm:py-6 text-xl sm:text-2xl"
                                     >
                                         JOIN THE LEGEND
                                     </AnimatedButton>

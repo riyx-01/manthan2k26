@@ -3,6 +3,12 @@ import './globals.css';
 import ClientLayout from '@/components/ClientLayout';
 import ScrollFilters from '@/components/ScrollFilters';
 
+import { Cinzel, Cormorant_Unicase, Marcellus } from 'next/font/google';
+
+const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel' });
+const cormorant = Cormorant_Unicase({ weight: ['300', '400', '500', '600', '700'], subsets: ['latin'], variable: '--font-cormorant' });
+const marcellus = Marcellus({ weight: '400', subsets: ['latin'], variable: '--font-marcellus' });
+
 export const metadata: Metadata = {
     title: 'Manthan 2026 | Tech Fest',
     description:
@@ -19,8 +25,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
-            <body className="min-h-screen text-gray-200 antialiased overflow-x-hidden">
+        <html lang="en" className={`${cinzel.variable} ${cormorant.variable} ${marcellus.variable}`}>
+            <body className="font-sans min-h-screen text-gray-200 antialiased overflow-x-hidden">
                 <ScrollFilters />
                 <ClientLayout>
                     {children}

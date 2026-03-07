@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Event } from '@/lib/types';
 import EventCard from '@/components/EventCard';
@@ -11,15 +11,24 @@ const categories = ['all', 'technical', 'cultural', 'sports'];
 export default function EventsFilter({ events }: { events: Event[] }) {
     const [activeCategory, setActiveCategory] = useState('all');
 
-    const filtered =
-        activeCategory === 'all'
+    const { filtered, outdoorSports, indoorSports, otherSports } = useMemo(() => {
+        const _filtered = activeCategory === 'all'
             ? events
             : events.filter((e) => e.category === activeCategory);
 
-    const sportsEvents = filtered.filter((e) => e.category === 'sports');
-    const outdoorSports = sportsEvents.filter((event) => getSportsTrackByName(event.name) === 'outdoor');
-    const indoorSports = sportsEvents.filter((event) => getSportsTrackByName(event.name) === 'indoor');
-    const otherSports = sportsEvents.filter((event) => !getSportsTrackByName(event.name));
+        const _sportsEvents = _filtered.filter((e) => e.category === 'sports');
+        const _outdoorSports = _sportsEvents.filter((event) => getSportsTrackByName(event.name) === 'outdoor');
+        const _indoorSports = _sportsEvents.filter((event) => getSportsTrackByName(event.name) === 'indoor');
+        const _otherSports = _sportsEvents.filter((event) => !getSportsTrackByName(event.name));
+
+        return {
+            filtered: _filtered,
+            sportsEvents: _sportsEvents,
+            outdoorSports: _outdoorSports,
+            indoorSports: _indoorSports,
+            otherSports: _otherSports
+        };
+    }, [activeCategory, events]);
 
     return (
         <>

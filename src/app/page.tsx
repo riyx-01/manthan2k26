@@ -59,12 +59,15 @@ export default function HomePage() {
                         }}
                         className="
                                 relative
-                                w-[75vw]
-                                h-[55vh]
+                                w-[85vw]
+                                h-[40vh]
+                                md:w-[75vw]
+                                md:h-[55vh]
                                 flex
                                 items-center
                                 justify-center
-                                mb-10
+                                mb-8
+                                md:mb-10
                                 "
                     >
                         <Image
@@ -99,7 +102,7 @@ export default function HomePage() {
                             initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 1.2, duration: 1 }}
-                            className="mt-6 font-ancient text-2xl md:text-3xl tracking-[0.35em] uppercase"
+                            className="mt-6 font-ancient text-xl md:text-3xl tracking-[0.25em] md:tracking-[0.35em] uppercase px-4 md:px-0"
                             style={{
                                 color: "#d4af37",
                                 textShadow: `
@@ -131,10 +134,10 @@ export default function HomePage() {
                 </section>
 
                 {/* EVENT CAROUSEL */}
-                <section className="relative py-24 pb-40 px-6 overflow-hidden bg-transparent">
+                <section className="relative py-16 md:py-24 pb-32 md:pb-40 px-4 md:px-6 overflow-hidden bg-transparent">
                     <div className="max-w-[1400px] mx-auto relative z-10">
-                        <div className="text-center mb-16">
-                            <h3 className="font-ancient text-5xl md:text-7xl text-gold-gradient uppercase mb-4">The Arena</h3>
+                        <div className="text-center mb-12 md:mb-16">
+                            <h3 className="font-ancient text-4xl sm:text-5xl md:text-7xl text-gold-gradient uppercase mb-3 md:mb-4">The Arena</h3>
                             <p className="font-serif italic text-manthan-gold/60 text-xl">Chronicles of Competition & Grace</p>
                         </div>
 
@@ -183,10 +186,10 @@ export default function HomePage() {
                 </section>
 
                 {/* CALL TO ACTION */}
-                <section className="py-24 bg-transparent">
+                <section className="py-16 md:py-24 bg-transparent">
                     <div className="max-w-4xl mx-auto text-center px-4">
-                        <ScrollWrapper padding="p-12">
-                            <h2 className="font-ancient text-4xl text-[#3d2b1f] mb-4">Ascend to Legend</h2>
+                        <ScrollWrapper padding="p-8 md:p-12">
+                            <h2 className="font-ancient text-3xl md:text-4xl text-[#3d2b1f] mb-4">Ascend to Legend</h2>
                             <p className="text-[#5c4033] mb-8 max-w-lg mx-auto italic">
                                 Unleash the spirit of the ancients. The realms of Manthan 2026 await your legend. Scribe your name in the chronicles of history.
                             </p>

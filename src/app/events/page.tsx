@@ -31,7 +31,7 @@ export default async function EventsPage() {
     return (
         <>
             <Navbar />
-            <main className="pt-24 pb-16 px-4 min-h-screen relative overflow-hidden">
+            <main className="pt-20 md:pt-24 pb-16 px-4 min-h-screen relative overflow-hidden">
                 {/* Background Glow */}
                 <div className="absolute top-0 right-1/4 w-96 h-96 bg-manthan-maroon/10 rounded-full blur-[120px] pointer-events-none" />
 

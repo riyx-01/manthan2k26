@@ -43,7 +43,7 @@ export default function VideoIntro({ onComplete }: VideoIntroProps) {
                 setIsVisible(false);
                 setTimeout(onComplete, 1000);
             }
-        }, 15000);
+        }, 8000);
         return () => clearTimeout(timer);
     }, [isVisible, onComplete]);
 

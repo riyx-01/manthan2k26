@@ -2,8 +2,10 @@
 
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import VideoIntro from './VideoIntro';
-import Chatbot from './Chatbot';
+
+const Chatbot = dynamic(() => import('./Chatbot'), { ssr: false });
 import { usePathname } from 'next/navigation';
 
 
@@ -150,12 +152,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 )}
                 {children}
 
-                {/* Chatbot - Only show after intro or on subpages */}
+                {/* Chatbot - Lazy loaded and only shown after intro or on subpages */}
                 {(introComplete || !isLandingPage) && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 1 }}
+                        transition={{ duration: 0.5, delay: 2 }} // Added slight delay to prioritize content
                     >
                         <Chatbot />
                     </motion.div>

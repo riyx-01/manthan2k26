@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Cormorant+Unicase:wght@300;400;500;600;700&display=swap');
 
 @font-face {
     font-family: 'MorrisRoman';
@@ -44,7 +43,7 @@ html {
 }
 
 body {
-    font-family: 'Marcellus', serif;
+    font-family: var(--font-marcellus), 'Marcellus', serif;
     color: #e0e0e0;
     overflow-x: hidden;
     background-color: var(--manthan-black);
@@ -67,11 +66,11 @@ h2,
 h3,
 h4,
 .font-ancient {
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-cinzel), 'Cinzel', serif;
 }
 
 .font-tagline {
-    font-family: 'Cormorant Unicase', serif;
+    font-family: var(--font-cormorant), 'Cormorant Unicase', serif;
 }
 
 .font-morris {
@@ -301,7 +300,7 @@ select:-webkit-autofill:focus {
         border-bottom: 2px solid #8b4513;
         color: #3d2b1f;
         padding: 0.75rem 1.25rem;
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-cinzel), 'Cinzel', serif;
         transition: all 0.3s ease;
         box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.05);
         filter: url(#torn-edge-subtle);
