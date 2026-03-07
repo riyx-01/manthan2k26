@@ -30,7 +30,7 @@ export default function HomePage() {
         { title: "Badminton", category: "Sports", description: "Outdoor sports challenge" },
     ];
 
-    const bgVideoUrl = "https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/extended%20.mp4";
+    const bgVideoUrl = "https://manthan-cdn.ameyabhagat24.workers.dev/extended.mp4";
 
     return (
         <motion.div

@@ -35,7 +35,7 @@ export default function ContactPage() {
                         e.currentTarget.playbackRate = 0.5;
                     }}
                 >
-                    <source src="https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/extended%20.mp4" type="video/mp4" />
+                    <source src="https://manthan-cdn.ameyabhagat24.workers.dev/extended.mp4" type="video/mp4" />
                 </video>
                 <div className="absolute inset-0 bg-black/60" />
             </div>

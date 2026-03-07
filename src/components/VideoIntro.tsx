@@ -12,8 +12,8 @@ interface VideoIntroProps {
  * Determine video source synchronously to avoid hydration/source-switch issues.
  */
 function getVideoSrc(): string {
-    // We now use a single high-quality intro video hosted on Vercel CDN for both desktop and mobile
-    return 'https://k6iphva0ugo1rocg.public.blob.vercel-storage.com/manthan/videos/p2_hq.mp4';
+    // Using Cloudflare Workers CDN for the intro video
+    return 'https://manthan-cdn.ameyabhagat24.workers.dev/p2.mp4';
 }
 
 export default function VideoIntro({ onComplete }: VideoIntroProps) {
