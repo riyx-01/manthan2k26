@@ -8,6 +8,9 @@ export const metadata: Metadata = {
     description:
         'Manthan 2026 - The ultimate college tech fest at Bharati Vidyapeeth Belapur, featuring technical, cultural, and sports events. Register now!',
     keywords: ['manthan', 'tech fest', 'college fest', 'hackathon', 'cultural fest', 'BVIMIT', 'Belapur', 'Navi Mumbai'],
+    icons: {
+        icon: '/manthan_final_logo.png',
+    },
 };
 
 export default function RootLayout({
@@ -17,9 +20,6 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <head>
-                <link rel="icon" href="/favicon.ico" />
-            </head>
             <body className="min-h-screen text-gray-200 antialiased overflow-x-hidden">
                 <ScrollFilters />
                 <ClientLayout>
