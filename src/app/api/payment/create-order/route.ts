@@ -145,8 +145,13 @@ export async function POST(request: NextRequest) {
         const validation = registrationSchema.safeParse(body);
 
         if (!validation.success) {
+            console.error('Validation failure details:', JSON.stringify(validation.error.flatten().fieldErrors, null, 2));
+            const firstError = Object.values(validation.error.flatten().fieldErrors)[0]?.[0];
             return NextResponse.json(
-                { error: 'Invalid input', details: validation.error.flatten().fieldErrors },
+                {
+                    error: firstError ? `Validation error: ${firstError}` : 'Invalid input',
+                    details: validation.error.flatten().fieldErrors
+                },
                 { status: 400 }
             );
         }
@@ -233,8 +238,14 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            totalAmountPaise +=
-                event.fee_calculation === 'per_participant' ? event.fee * teamSize : event.fee;
+            let eventAmount = event.fee_calculation === 'per_participant' ? event.fee * teamSize : event.fee;
+
+            // Special case for Cultural events: Solo 200, Group 400
+            if (event.category === 'cultural' && (event.name === 'NrityaVerse' || event.name === 'SurTarang')) {
+                eventAmount = teamSize > 1 ? 40000 : 20000;
+            }
+
+            totalAmountPaise += eventAmount;
         }
 
         if (totalAmountPaise <= 0) {

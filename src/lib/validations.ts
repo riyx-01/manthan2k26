@@ -5,15 +5,16 @@ const teamMemberSchema = z.object({
         .string()
         .min(2, 'Member name must be at least 2 characters')
         .max(100, 'Member name must be less than 100 characters')
-        .regex(/^[a-zA-Z\s.'-]+$/, 'Member name contains invalid characters'),
+        .trim(),
 });
 
 const teamRegistrationSchema = z.object({
-    event_id: z.string().uuid('Invalid team event ID'),
+    event_id: z.string().min(1, 'Invalid team event ID'),
     team_name: z
         .string()
         .trim()
         .max(100, 'Team name must be less than 100 characters')
+        .nullable()
         .optional()
         .or(z.literal('')),
     team_size: z
@@ -29,7 +30,7 @@ export const registrationSchema = z.object({
         .string()
         .min(2, 'Name must be at least 2 characters')
         .max(100, 'Name must be less than 100 characters')
-        .regex(/^[a-zA-Z\s.'-]+$/, 'Name contains invalid characters'),
+        .trim(),
     email: z
         .string()
         .email('Invalid email address')
@@ -49,7 +50,7 @@ export const registrationSchema = z.object({
         .min(1, 'Please enter your department')
         .max(100, 'Department must be less than 100 characters'),
     event_ids: z
-        .array(z.string().uuid('Invalid event ID'))
+        .array(z.string().min(1, 'Invalid event ID'))
         .min(1, 'Select at least one event')
         .max(12, 'Cannot select more than 12 events'),
     team_registrations: z

@@ -108,7 +108,7 @@ export default function ConfirmationPage() {
           </div>
           <div class="total">Offerings: ${registration ? formatFee(registration.total_amount) : ''}</div>
           <div class="footer">
-            <p>15th - 16th of March, 2026</p>
+            <p>24th - 25th of March, 2026</p>
             <p style="margin-top:4px;">Inscribed in the permanent scrolls of the Realm.</p>
           </div>
         </div>
@@ -275,7 +275,7 @@ export default function ConfirmationPage() {
 
                                 <div className="text-center">
                                     <p className="text-[#5c4033]/40 text-[10px] font-ancient uppercase tracking-[0.2em]">
-                                        March 15-16, 2026 • College Campus
+                                        March 24-25, 2026 • College Campus
                                     </p>
                                     <div className="flex items-start gap-4 p-4 rounded-xl bg-manthan-maroon/5 border border-manthan-maroon/10 mt-6">
                                         <ShieldCheck size={18} className="text-manthan-maroon flex-shrink-0 mt-0.5" />
