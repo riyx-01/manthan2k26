@@ -355,22 +355,8 @@ export default function ConfirmationPage() {
                         <div ref={passRef} className="parchment-body p-6 sm:p-10 shrink-0 relative">
                             {/* Pass Logos */}
                             <div className="flex justify-between items-start mb-6 -mt-2">
-                                <div className="relative w-12 h-12">
-                                    <Image
-                                        src="/manthan_final_logo2.png"
-                                        alt="Logo L"
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
-                                <div className="relative w-12 h-12">
-                                    <Image
-                                        src="/bbbg-removebg-preview.png"
-                                        alt="Logo R"
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
+                                <Image src="/manthan_final_logo2.png" width={48} height={48} className="w-12 h-auto object-contain" alt="Logo L" />
+                                <Image src="/bbbg-removebg-preview.png" width={48} height={48} className="w-12 h-auto object-contain" alt="Logo R" />
                             </div>
 
                             {/* Pass Header */}
