@@ -320,6 +320,26 @@ select:-webkit-autofill:focus {
     .gold-glow {
         filter: drop-shadow(0 0 10px rgba(212, 168, 55, 0.6));
     }
+
+    .torn-dark-panel {
+        position: relative;
+        background: transparent;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+
+    .torn-dark-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(139, 0, 0, 0.03);
+        /* Extremely subtle maroon hint */
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+        z-index: -1;
+        pointer-events: none;
+        border-radius: 20px;
+    }
 }
 
 /* Hide all video controls and browser-specific overlays */

@@ -28,8 +28,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const bgVideoSrc = 'https://manthan-cdn.ameyabhagat24.workers.dev/extended.mp4';
-    const targetOpacity = isLandingPage ? 0.46 : 0.34;
-    const loopFadeOpacity = isLandingPage ? 0.28 : 0.22;
+    const targetOpacity = 0.46;
+    const loopFadeOpacity = 0.28;
 
     // Fade near the natural end of the clip so final frames are always visible.
     const handleTimeUpdate = () => {
@@ -143,13 +143,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 className={(isLandingPage && !introComplete) ? "fixed inset-0 pointer-events-none overflow-hidden bg-transparent" : "relative min-h-screen bg-transparent"}
             >
                 {/* Home Page Specific Background Override */}
-                {isLandingPage && (
-                    <style jsx global>{`
-                        body::before {
-                            display: none !important;
-                        }
-                    `}</style>
-                )}
+                <style jsx global>{`
+                    body::before {
+                        display: none !important;
+                    }
+                `}</style>
                 {children}
 
                 {/* Chatbot - Lazy loaded and only shown after intro or on subpages */}

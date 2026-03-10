@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Footer from '@/components/Footer';
 import ScrollWrapper from '@/components/ScrollWrapper';
 import { motion } from 'framer-motion';
-import { Trophy, Star, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { Trophy, Star, ShieldCheck, Heart } from 'lucide-react';
 
 const sponsors = [
     {
@@ -21,15 +21,6 @@ const sponsors = [
         items: [
             { id: 1, name: 'Razorpay', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg' },
             { id: 2, name: 'AWS', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg' }
-        ]
-    },
-    {
-        tier: 'Technology Partners',
-        icon: Zap,
-        items: [
-            { id: 1, name: 'MongoDB', logo: 'https://upload.wikimedia.org/wikipedia/en/4/45/MongoDB-Logo.svg' },
-            { id: 2, name: 'Vercel', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Vercel_logo_black.svg' },
-            { id: 3, name: 'Postman', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Postman_%28software%29.png' }
         ]
     },
     {

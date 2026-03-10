@@ -35,8 +35,9 @@ export default function EventsFilter({ events }: { events: Event[] }) {
             {/* Filter Tabs */}
             <div className="flex flex-wrap justify-center gap-4 mb-12 parchment-container !p-6 rounded-none border-none shadow-none bg-transparent">
                 {categories.map((cat) => (
-                    <button
+                    <motion.button
                         key={cat}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setActiveCategory(cat)}
                         className={`font-ancient px-8 py-3 transition-all duration-300 uppercase tracking-widest text-sm ${activeCategory === cat
                             ? 'bg-manthan-maroon text-white shadow-[0_0_20px_rgba(92,10,10,0.3)] scale-105'
@@ -44,7 +45,7 @@ export default function EventsFilter({ events }: { events: Event[] }) {
                             }`}
                     >
                         {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </button>
+                    </motion.button>
                 ))}
             </div>
 
@@ -67,7 +68,7 @@ export default function EventsFilter({ events }: { events: Event[] }) {
                                 <h2 className="font-ancient text-2xl uppercase tracking-[0.2em] text-[#3d2b1f] mb-8 border-b border-[#3d2b1f]/20 pb-4">
                                     Outdoor Sports
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 event-sub-container p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 torn-dark-panel p-8">
                                     {outdoorSports.map((event) => (
                                         <EventCard key={event.id} event={event} />
                                     ))}
@@ -93,7 +94,7 @@ export default function EventsFilter({ events }: { events: Event[] }) {
                                 <h2 className="font-ancient text-2xl uppercase tracking-[0.2em] text-[#3d2b1f] mb-8 border-b border-[#3d2b1f]/20 pb-4">
                                     Indoor Sports
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 event-sub-container p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 torn-dark-panel p-8">
                                     {indoorSports.map((event) => (
                                         <EventCard key={event.id} event={event} />
                                     ))}
@@ -119,7 +120,7 @@ export default function EventsFilter({ events }: { events: Event[] }) {
                                 <h2 className="font-ancient text-2xl uppercase tracking-[0.2em] text-[#3d2b1f] mb-8 border-b border-[#3d2b1f]/20 pb-4">
                                     More Sports Events
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 event-sub-container p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 torn-dark-panel p-8">
                                     {otherSports.map((event) => (
                                         <EventCard key={event.id} event={event} />
                                     ))}
@@ -147,7 +148,7 @@ export default function EventsFilter({ events }: { events: Event[] }) {
                                 {activeCategory} Events
                             </h2>
                         )}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 event-sub-container p-6 rounded-2xl">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 torn-dark-panel p-6">
                             {filtered.map((event) => (
                                 <EventCard key={event.id} event={event} />
                             ))}

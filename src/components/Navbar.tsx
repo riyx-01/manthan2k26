@@ -86,13 +86,25 @@ export default function Navbar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="relative py-2 group/link"
+                            className="relative py-2 group/link flex flex-col items-center"
                         >
-                            <span className={`font-pfeffer text-xl tracking-[0.15em] transition-all duration-300 ${activeLink === link.href ? 'text-manthan-gold' : 'text-gray-300 group-hover/link:text-white'
-                                }`}>
+                            <motion.span
+                                whileTap={{ scale: 0.9 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                                className={`font-pfeffer text-xl tracking-[0.15em] transition-all duration-300 ${activeLink === link.href ? 'text-manthan-gold' : 'text-gray-300 group-hover/link:text-white'
+                                    }`}
+                            >
                                 {link.label}
-                            </span>
-                            <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-manthan-gold transition-all duration-500 group-hover:w-full"></span>
+                            </motion.span>
+                            {activeLink === link.href ? (
+                                <motion.span
+                                    layoutId="nav-underline"
+                                    className="absolute -bottom-1 left-0 right-0 h-[1.5px] bg-manthan-gold"
+                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                />
+                            ) : (
+                                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-manthan-gold transition-all duration-500 group-hover:w-full"></span>
+                            )}
                         </Link>
                     ))}
 
