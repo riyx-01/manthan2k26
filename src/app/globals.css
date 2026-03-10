@@ -340,6 +340,39 @@ select:-webkit-autofill:focus {
         pointer-events: none;
         border-radius: 20px;
     }
+
+    /* --- Performance & Flashlight Load Utilities --- */
+    .will-change-transform {
+        will-change: transform;
+    }
+
+    .will-change-opacity {
+        will-change: opacity;
+    }
+
+    .gpu-accelerated {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000;
+    }
+
+    @keyframes flashlight {
+        0% {
+            opacity: 0;
+            filter: brightness(2);
+            transform: scale(1.1);
+        }
+
+        100% {
+            opacity: 1;
+            filter: brightness(1);
+            transform: scale(1);
+        }
+    }
+
+    .animate-flashlight {
+        animation: flashlight 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
 }
 
 /* Hide all video controls and browser-specific overlays */

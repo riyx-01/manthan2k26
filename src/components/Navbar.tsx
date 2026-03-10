@@ -11,7 +11,7 @@ import AnimatedButton from './AnimatedButton';
 const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
-    { href: '/sponsorship', label: 'Sponsorship' },
+    // { href: '/sponsorship', label: 'Sponsorship' },
     { href: '/about', label: 'About Us' },
     { href: '/contact', label: 'Contact' },
 ];

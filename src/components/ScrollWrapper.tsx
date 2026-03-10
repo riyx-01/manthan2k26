@@ -7,9 +7,10 @@ interface ScrollWrapperProps {
     children: ReactNode;
     className?: string;
     padding?: string;
+    speed?: number;
 }
 
-export default function ScrollWrapper({ children, className = '', padding = 'p-8 md:p-12' }: ScrollWrapperProps) {
+export default function ScrollWrapper({ children, className = '', padding = 'p-8 md:p-12', speed = 1 }: ScrollWrapperProps) {
     return (
         <motion.div
             initial="closed"
@@ -30,7 +31,7 @@ export default function ScrollWrapper({ children, className = '', padding = 'p-8
                     closed: { height: 0, opacity: 0 },
                     open: { height: 'auto', opacity: 1 }
                 }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={{ duration: speed, ease: "easeOut" }}
                 className={`parchment-body ${padding}`}
             >
                 {children}

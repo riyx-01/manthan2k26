@@ -36,14 +36,14 @@ export default function VideoIntro({ onComplete }: VideoIntroProps) {
         }
     }, [isBuffering]);
 
-    // Safety fallback - skip intro if video never loads within 15s
+    // Safety fallback - skip intro if video never loads within 4s (faster fallback)
     useEffect(() => {
         const timer = setTimeout(() => {
             if (isVisible) {
                 setIsVisible(false);
-                setTimeout(onComplete, 1000);
+                setTimeout(onComplete, 500); // Shorter completion delay
             }
-        }, 8000);
+        }, 4000);
         return () => clearTimeout(timer);
     }, [isVisible, onComplete]);
 
@@ -53,23 +53,10 @@ export default function VideoIntro({ onComplete }: VideoIntroProps) {
                 <motion.div
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }} // Snappier exit
                     className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
                     style={{ height: '100svh' }}
                 >
-                    <AnimatePresence>
-                        {isBuffering && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 1, ease: "easeInOut" }}
-                                className="absolute inset-0 z-[10001] flex items-center justify-center bg-black"
-                            >
-                                <LogoLoading />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
 
                     <video
                         ref={videoRef}

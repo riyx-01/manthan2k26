@@ -4,10 +4,9 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import VideoIntro from './VideoIntro';
-
+import FlashlightPreloader from './FlashlightPreloader';
 const Chatbot = dynamic(() => import('./Chatbot'), { ssr: false });
 import { usePathname } from 'next/navigation';
-
 
 export const IntroContext = createContext({
     introComplete: false,
@@ -23,6 +22,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const [introComplete, setIntroComplete] = useState(false);
     const [isLoopFading, setIsLoopFading] = useState(false);
     const [bgVideoReady, setBgVideoReady] = useState(false);
+    const [isAppMounted, setIsAppMounted] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const backgroundPlayedRef = useRef(false);
     const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -30,6 +30,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const bgVideoSrc = 'https://manthan-cdn.ameyabhagat24.workers.dev/extended.mp4';
     const targetOpacity = 0.46;
     const loopFadeOpacity = 0.28;
+
+    useEffect(() => {
+        // Instant mount for preloader
+        setIsAppMounted(true);
+    }, []);
 
     // Fade near the natural end of the clip so final frames are always visible.
     const handleTimeUpdate = () => {
@@ -84,11 +89,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             }
             const onCanPlay = () => {
                 setBgVideoReady(true);
-                // Add delay to ensure intro fade is completely finished
+                // Reduced delay to ensure intro transition is snappier
                 setTimeout(() => {
-                    video.currentTime = 0; // Ensure it starts from beginning
-                    video.play().catch(() => { });
-                }, 900); // Delay keeps transition smooth after intro exits
+                    video.currentTime = 0;
+                    if (video) video.play().catch(() => { });
+                }, 300); // Shorter delay for faster transition
                 video.removeEventListener('canplay', onCanPlay);
             };
             video.addEventListener('canplay', onCanPlay);
@@ -98,6 +103,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     return (
         <IntroContext.Provider value={{ introComplete, setIntroComplete }}>
+            {/* Instant Preloader - Disappears once app is ready for intro */}
+            <AnimatePresence>
+                {!isAppMounted && <FlashlightPreloader key="preloader" />}
+            </AnimatePresence>
+
             {/* Global Solid Background - Prevents white flash */}
             <div className="fixed inset-0 bg-manthan-black -z-20" />
 
@@ -108,7 +118,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 )}
             </AnimatePresence>
 
-            {/* Global Background Video - Lazy loaded, Manual Looping with Fades */}
+            {/* Global Background Video - Optimized loading */}
             <video
                 ref={videoRef}
                 muted
@@ -121,7 +131,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 tabIndex={-1}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={handleVideoLoop}
-                className="fixed top-1/2 left-1/2 min-w-[110%] min-h-[110%] w-auto h-auto object-cover transition-opacity duration-200 ease-out pointer-events-none bg-black"
+                className="fixed top-1/2 left-1/2 min-w-[110%] min-h-[110%] w-auto h-auto object-cover transition-opacity duration-500 ease-out pointer-events-none bg-black will-change-opacity gpu-accelerated"
                 style={{
                     opacity: (introComplete || !isLandingPage) && bgVideoReady
                         ? (isLoopFading ? loopFadeOpacity : targetOpacity)
@@ -134,13 +144,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 }}
             />
 
-            {/* Source is set dynamically via JS for lazy loading */}
-
             <motion.div
                 initial={false}
                 animate={{ opacity: (isLandingPage && !introComplete) ? 0 : 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                className={(isLandingPage && !introComplete) ? "fixed inset-0 pointer-events-none overflow-hidden bg-transparent" : "relative min-h-screen bg-transparent"}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className={`will-change-opacity ${(isLandingPage && !introComplete) ? "fixed inset-0 pointer-events-none overflow-hidden bg-transparent" : "relative min-h-screen bg-transparent"}`}
             >
                 {/* Home Page Specific Background Override */}
                 <style jsx global>{`
@@ -150,12 +158,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 `}</style>
                 {children}
 
-                {/* Chatbot - Lazy loaded and only shown after intro or on subpages */}
+                {/* Chatbot - Prioritized delay */}
                 {(introComplete || !isLandingPage) && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 2 }} // Added slight delay to prioritize content
+                        transition={{ duration: 0.5, delay: 3 }} // Further delay to prioritize main content
                     >
                         <Chatbot />
                     </motion.div>

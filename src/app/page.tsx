@@ -1,19 +1,21 @@
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ArrowRight, Sparkles, MapPin } from 'lucide-react';
-import { useState } from 'react';
 import { scheduleData } from '@/lib/constants';
+import { getActiveEvents } from '@/lib/events-catalog';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { IntroContext } from '@/components/ClientLayout';
 import ScrollWrapper from '@/components/ScrollWrapper';
 import AnimatedButton from '@/components/AnimatedButton';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectCoverflow } from 'swiper/modules';
+
+// Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
@@ -24,21 +26,17 @@ export default function HomePage() {
     const [activeDay, setActiveDay] = useState(0);
 
     const heroContentOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-    const events = [
-        { title: "Prompt2Website", category: "Technical", description: "The Vibe Coding Challenge" },
-        { title: "NrityaVerse", category: "Cultural", description: "Where tradition meets expression" },
-        { title: "Box Cricket", category: "Sports", description: "The urban cricket league" },
-        { title: "TypeSprint", category: "Technical", description: "The Ultimate Typing Showdown" },
-        { title: "SurTarang", category: "Cultural", description: "Ride the waves of melody" },
-        { title: "Badminton", category: "Sports", description: "Outdoor sports challenge" },
-    ];
+    const events = useMemo(() => getActiveEvents(), []);
 
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: introComplete ? 1 : 0 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className={`${introComplete ? "block" : "hidden"} bg-transparent overflow-x-hidden`}
+            initial={{ opacity: 0, visibility: "hidden" }}
+            animate={{
+                opacity: introComplete ? 1 : 0,
+                visibility: introComplete ? "visible" : "hidden"
+            }}
+            transition={{ duration: 0.3, ease: "linear" }} // Ultra-fast transition
+            className="bg-transparent overflow-x-hidden min-h-screen"
         >
             <Navbar />
 
@@ -149,6 +147,7 @@ export default function HomePage() {
                             grabCursor={true}
                             centeredSlides={true}
                             slidesPerView={'auto'}
+                            loop={true}
                             observer={true}
                             observeParents={true}
                             coverflowEffect={{
@@ -159,22 +158,26 @@ export default function HomePage() {
                                 slideShadows: false,
                             }}
                             autoplay={{
-                                delay: 2500,
+                                delay: 3000,
                                 disableOnInteraction: false,
                             }}
-                            speed={1000}
+                            speed={400} // Snappier slide transitions
                             pagination={{ clickable: true }}
                             modules={[Autoplay, Pagination, EffectCoverflow]}
                             className="event-swiper !pb-20"
                         >
                             {events.map((event, idx) => (
                                 <SwiperSlide key={idx} className="!w-[300px] md:!w-[420px]">
-                                    <Link href={`/events?category=${event.category.toLowerCase()}`} className="block h-full transform transition-transform duration-500 hover:scale-105 active:scale-95">
-                                        <ScrollWrapper padding="p-10" className="min-h-[480px]">
-                                            <span className="font-ancient text-sm tracking-[0.3em] uppercase text-manthan-maroon mb-4 block underline decoration-manthan-maroon/20 underline-offset-8">{event.category}</span>
-                                            <h4 className="font-ancient text-4xl text-[#3d2b1f] mb-6 leading-tight">{event.title}</h4>
+                                    <Link href={`/events/${event.slug}`} className="block h-full transform transition-transform duration-500 hover:scale-105 active:scale-95">
+                                        <ScrollWrapper padding="p-10" className="min-h-[480px]" speed={0.4}>
+                                            <span className="font-ancient text-sm tracking-[0.3em] uppercase text-manthan-maroon mb-4 block underline decoration-manthan-maroon/20 underline-offset-8">
+                                                {event.category}
+                                            </span>
+                                            <h4 className="font-ancient text-3xl md:text-4xl text-[#3d2b1f] mb-6 leading-tight uppercase font-bold">
+                                                {event.name.split(':')[0]}
+                                            </h4>
                                             <div className="h-[2px] w-16 bg-manthan-maroon mb-8" />
-                                            <p className="font-serif italic text-[#5c4033] text-xl leading-relaxed">
+                                            <p className="font-serif italic text-[#5c4033] text-lg md:text-xl leading-relaxed">
                                                 {event.description}
                                             </p>
                                             <div className="mt-10 flex items-center gap-3 font-ancient font-bold text-manthan-maroon uppercase tracking-widest text-base">
@@ -228,13 +231,52 @@ export default function HomePage() {
                             transition={{ duration: 0.6 }}
                             className="space-y-6"
                         >
-                            <div className="text-center mb-8 flex flex-col items-center gap-2">
-                                <span className="font-ancient text-2xl text-manthan-gold tracking-widest border-b border-manthan-gold/30 pb-2">
-                                    {scheduleData[activeDay].date}
-                                </span>
-                                <span className="font-ancient text-xl font-bold text-manthan-gold uppercase tracking-[0.2em]">
-                                    timing : 9 onwards
-                                </span>
+                            <div className="mb-10 relative">
+                                {(() => {
+                                    const dateParts = scheduleData[activeDay].date.split(' ');
+                                    const month = dateParts[0];
+                                    const dateNum = dateParts[1].replace(',', '');
+                                    const dayLabel = dateParts[dateParts.length - 2] + ' ' + dateParts[dateParts.length - 1];
+
+                                    return (
+                                        <div className="flex flex-col items-center">
+                                            {/* Compact Elegant Date Group */}
+                                            <div className="relative py-6 px-10 md:px-14 border border-manthan-gold/20 rounded-2xl bg-manthan-black/20 backdrop-blur-md flex flex-col items-center group overflow-hidden">
+                                                {/* Ambient Glow */}
+                                                <div className="absolute -inset-10 bg-manthan-gold/5 blur-2xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+
+                                                <div className="relative flex flex-col items-center">
+                                                    <span className="font-ancient text-manthan-gold/60 tracking-[0.4em] uppercase text-[10px] mb-2 font-bold">
+                                                        {dayLabel}
+                                                    </span>
+
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="font-ancient text-4xl md:text-6xl font-black text-gold-gradient select-none">
+                                                            {dateNum}
+                                                        </span>
+                                                        <div className="w-px h-8 bg-manthan-gold/30" />
+                                                        <div className="flex flex-col items-start">
+                                                            <span className="font-ancient text-xl md:text-2xl font-bold text-manthan-gold uppercase tracking-widest leading-none">
+                                                                {month}
+                                                            </span>
+                                                            <span className="font-pfeffer text-[8px] md:text-[10px] tracking-[0.1em] text-manthan-gold/40 mt-1 uppercase">
+                                                                March MMXXVI
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-4 flex items-center gap-3 px-4 py-1.5 bg-manthan-gold/10 rounded-full border border-manthan-gold/10">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-manthan-gold animate-pulse" />
+                                                        <span className="font-ancient text-sm md:text-base font-bold text-manthan-gold uppercase tracking-[0.3em]">
+                                                            09:00 AM <span className="text-manthan-gold/40 font-pfeffer text-[10px] lowercase tracking-normal italic">onwards</span>
+                                                        </span>
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-manthan-gold animate-pulse" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
 
                             <ScrollWrapper padding="p-2 sm:p-4 md:p-8">

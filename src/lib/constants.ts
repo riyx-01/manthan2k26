@@ -118,7 +118,7 @@ export const scheduleData = [
     {
         date: 'March 24, 2026 - Day 1',
         slots: [
-            { time: '09:00 AM - 10:00 AM', event: 'Opening/Inauguration Ceremony', venue: 'Main Auditorium', category: 'cultural' },
+            { time: '09:00 AM - 10:00 AM', event: 'Opening/Inauguration Ceremony', venue: 'HM Auditorium', category: 'cultural' },
             { time: '10:00 AM - 05:00 PM', event: 'Prompt2Website: The Vibe Coding Challenge', venue: 'Computer Lab 1', category: 'technical' },
             { time: '10:00 AM - 05:00 PM', event: 'TypeSprint: The Ultimate Typing Showdown', venue: 'Computer Lab 2', category: 'technical' },
             { time: '10:00 AM - 05:00 PM', event: 'QuizStorm: Battle of Brains', venue: 'Computer Lab 2', category: 'technical' },
@@ -138,9 +138,9 @@ export const scheduleData = [
     {
         date: 'March 25, 2026 - Day 2',
         slots: [
-            { time: '09:00 AM - 01:00 PM', event: 'NrityaVerse (Dance)', venue: 'Main Stage', category: 'cultural' },
-            { time: '01:00 AM - 04:00 PM', event: 'SurTarang (Singing)', venue: 'Seminar Hall', category: 'cultural' },
-            { time: '04:00 PM onwards', event: 'Closing Ceremony & Prize Distribution', venue: 'Main Stage', category: 'cultural' },
+            { time: '09:00 AM - 01:00 PM', event: 'NrityaVerse (Dance)', venue: 'HM Auditorium', category: 'cultural' },
+            { time: '01:00 AM - 04:00 PM', event: 'SurTarang (Singing)', venue: 'HM Auditorium', category: 'cultural' },
+            { time: '04:00 PM onwards', event: 'Closing Ceremony & Prize Distribution', venue: 'HM Auditorium', category: 'cultural' },
         ],
     },
 ];

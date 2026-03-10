@@ -12,13 +12,15 @@ const teamMembers = [
         role: 'UI/UX Designer & Frontend Developer',
         image: '/profile/riya2nobg.png',
         isLead: true,
-        imageClass: 'object-center scale-150 group-hover:scale-115'
+        imageClass: 'object-center scale-150 group-hover:scale-115',
+        linkedin: 'https://www.linkedin.com/in/riyathakur01'
     },
     {
         name: 'Ameya Bhagat',
         role: 'Backend & Infrastructure Developer',
         image: '/profile/ameya%20bg%20remove.png',
-        imageClass: 'object-center scale-110 group-hover:scale-115'
+        imageClass: 'object-center scale-110 group-hover:scale-115',
+        linkedin: 'https://www.linkedin.com/in/ameyabhagat24'
     },
     {
         name: 'Aryan Lehgaonkar',
@@ -57,8 +59,8 @@ export default function WorkforcePage() {
                     </motion.div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {teamMembers.map((member, index) => (
-                            <div key={index} className="max-w-sm mx-auto md:max-w-none w-full transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(212,168,55,0.15)] rounded-xl overflow-hidden">
+                        {teamMembers.map((member, index) => {
+                            const CardContent = (
                                 <ScrollWrapper
                                     padding="p-0"
                                     className="group transition-all duration-500 w-full h-full"
@@ -72,6 +74,14 @@ export default function WorkforcePage() {
                                             className={`object-cover transition-transform duration-700 grayscale group-hover:grayscale-0 ${member.imageClass ? member.imageClass : 'object-top group-hover:scale-110'}`}
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#3d2b1f] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+
+                                        {member.linkedin && (
+                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg transform translate-y-2 group-hover:translate-y-0">
+                                                <svg className="w-5 h-5 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                                                </svg>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="p-6 relative z-10 -mt-12 h-full">
@@ -88,8 +98,20 @@ export default function WorkforcePage() {
                                         </div>
                                     </div>
                                 </ScrollWrapper>
-                            </div>
-                        ))}
+                            );
+
+                            return (
+                                <div key={index} className="max-w-sm mx-auto md:max-w-none w-full transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(212,168,55,0.15)] rounded-xl overflow-hidden">
+                                    {member.linkedin ? (
+                                        <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                            {CardContent}
+                                        </a>
+                                    ) : (
+                                        CardContent
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </main>

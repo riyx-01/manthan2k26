@@ -43,7 +43,7 @@ export default function Footer() {
                             {[
                                 { href: '/events', label: 'Events' },
                                 { href: '/workforce', label: 'Workforce' },
-                                { href: '/sponsorship', label: 'Sponsorship' },
+                                // { href: '/sponsorship', label: 'Sponsorship' },
                                 { href: '/about', label: 'About Us' },
                                 { href: '/contact', label: 'Contact Us' },
                             ].map((link) => (

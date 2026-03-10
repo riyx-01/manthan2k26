@@ -182,7 +182,7 @@ export const EVENT_CATALOG: Event[] = [
         current_participants: 0,
         event_date: '2026-03-25 09:00:00+05:30',
         registration_deadline: null,
-        venue: 'Main Stage',
+        venue: 'HM Auditorium',
         rules: [
             'Event Coordinator: Diya Nemade (Lead)',
             'Entry Fee: ₹200 (Solo) / ₹400 (Group)',
@@ -221,7 +221,7 @@ export const EVENT_CATALOG: Event[] = [
         current_participants: 0,
         event_date: '2026-03-25 09:00:00+05:30',
         registration_deadline: null,
-        venue: 'Seminar Hall',
+        venue: 'HM Auditorium',
         rules: [
             'Event Coordinator: Prerna Dikondwar (Lead)',
             'Entry Fee: ₹200 (Solo) / ₹400 (Group)',
