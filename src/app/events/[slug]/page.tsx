@@ -3,7 +3,7 @@ import { formatFee, formatDateTime, categoryColors, categoryIcons } from '@/lib/
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { Calendar, MapPin, Users, ArrowLeft, IndianRupee } from 'lucide-react';
+import { Calendar, MapPin, Users, IndianRupee } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
 import { getEventBySlug } from '@/lib/events-catalog';
