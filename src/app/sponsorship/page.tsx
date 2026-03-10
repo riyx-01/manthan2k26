@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Footer from '@/components/Footer';
 import ScrollWrapper from '@/components/ScrollWrapper';
 import { motion } from 'framer-motion';
-import { Trophy, Star, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { Trophy, Star, ShieldCheck, Heart } from 'lucide-react';
 
 const sponsors = [
     {
